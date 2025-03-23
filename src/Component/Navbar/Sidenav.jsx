@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { HiMenu, HiX } from "react-icons/hi"; // Import menu icons
+import { HiMenu, HiX } from "react-icons/hi";
 
 const Sidenav = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="flex justify-between items-center bg-gray-200 p-4">
+    <nav className="flex justify-between items-center bg-gray-200 p-4 fixed top-0 left-0 w-full z-50 shadow-md">
       {/* Logo */}
       <div>
         <img src="/assets/react-logo.svg" alt="React logo" className="w-12" />
@@ -35,14 +35,14 @@ const Sidenav = () => {
 
       {/* Mobile Menu (Shown when `isOpen` is true) */}
       {isOpen && (
-        <div className="absolute top-16 left-0 w-full bg-gray-200 shadow-md md:hidden">
+        <div className="absolute top-16 left-0 w-full bg-gray-200 shadow-md md:hidden z-50">
           <ul className="flex flex-col items-center space-y-4 py-4">
             {["Home", "About", "Service", "Contact"].map((item) => (
               <li
                 key={item}
                 className="cursor-pointer transition-all duration-300 
                            hover:border-t-2 hover:border-b-2 border-black border-solid"
-                onClick={() => setIsOpen(false)} // Close menu on click
+                onClick={() => setIsOpen(false)}
               >
                 {item}
               </li>
