@@ -1,5 +1,23 @@
 import React, { useState } from 'react';
 import { HiMenu, HiX } from "react-icons/hi";
+import { motion, AnimatePresence } from 'framer-motion';
+
+const menuVariants = {
+  hidden: {
+    opacity: 0,
+    y: -20,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3 },
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    transition: { duration: 0.2 },
+  },
+};
 
 const Sidenav = () => {
   const [isOpen, setIsOpen] = useState(false);
