@@ -15,19 +15,15 @@ const servicedata = [
 const Services = () => {
   return (
     <div>
-         <div className="flex items-center justify-center gap-2 my-6 leading-none">
-        {/* Left lines */}
+      {/* Section Title */}
+      <div className="flex items-center justify-center gap-2 my-6 leading-none">
         <div className="flex flex-col items-end justify-center gap-[16px]">
-        <div className="w-16 h-[2px] bg-red-600" />
-        <div className="w-32 h-[2px] bg-blue-600" />
+          <div className="w-16 h-[2px] bg-red-600" />
+          <div className="w-32 h-[2px] bg-blue-600" />
         </div>
-
-        {/* Heading */}
         <h1 className="text-3xl font-bold text-gray-800 whitespace-nowrap leading-none m-0 p-0">
           WHY CHOOSE US
         </h1>
-
-        {/* Right lines */}
         <div className="flex flex-col items-start justify-center gap-[16px]">
           <div className="w-16 h-[2px] bg-red-600" />
           <div className="w-32 h-[2px] bg-blue-600" />
@@ -53,10 +49,11 @@ const Services = () => {
         {servicedata.map((service, index) => (
           <div
             key={index}
-            className="flex flex-col gap-5 group cursor-pointer w-44 sm:w-52 shadow-2xl"
+            className="flex flex-col rounded-3xl gap-5 group cursor-pointer w-full max-w-[280px] shadow-2xl"
+
           >
             {/* Icon Box */}
-            <div className="bg-gradient-to-r aspect-square flex items-center justify-center m-1 from-gray-100 to-gray-300">
+            <div className="bg-gradient-to-r aspect-square flex items-center justify-center rounded-3xl m-1 from-gray-100 to-gray-300">
               <img
                 src={service.img}
                 alt={`${service.title} Icon`}
@@ -65,12 +62,12 @@ const Services = () => {
             </div>
 
             {/* Text + Arrow */}
-            <div className="flex flex-row place-items-center m-1 gap-3">
+            <div className="flex flex-row place-items-center m-2 gap-3">
               <div className="flex flex-col gap-1">
                 <p className="font-semibold text-lg sm:text-xl relative after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:absolute after:origin-bottom-left after:transform after:ease-in-out after:duration-500 w-full after:w-full group-hover:after:scale-x-100 group-hover:after:origin-bottom-left after:bg-lime-600 text-gray-600">
                   {service.title}
                 </p>
-                <p className="text-sm text-gray-500">{service.desc}</p>
+                <p className="text-sm  text-gray-500 m-2">{service.desc}</p>
               </div>
             </div>
           </div>
@@ -87,7 +84,7 @@ const Services = () => {
         </button>
       </div>
     </div>
-  )
+  );
 }
 
 export default Services
