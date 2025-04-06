@@ -39,7 +39,7 @@ const Card = () => {
         </div>
       </div>
       <div className="flex flex-col  items-center justify-center">
-        <h1 className="text-5xl"> Enabling Your Immigration  <br /> <h1 className="text-4xl text-center py-2">Successfully</h1> </h1>
+        <h1 className="text-5xl text-center"> Enabling Your Immigration  <br /> <h1 className="text-4xl text-center py-2">Successfully</h1> </h1>
         <p className="text-center text-gray-500 py-6 ">Lorem ipsum dolor, sit amet consectetur adipisicing elit.<br/> Alias sed deserunt animi reiciendis et quia, adipisci veniam, aperiam voluptates vel rem quidem eum omnis officia suscipit. Rem eum perferendis corporis!</p>
       </div>
       <div className="flex flex-wrap justify-center gap-6 py-11">
