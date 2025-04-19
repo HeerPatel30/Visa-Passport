@@ -6,6 +6,8 @@ import Sidenav from './Component/Navbar/Sidenav';
 import Banner from './Component/HeroBanner/Banner';
 import Card from './Component/VisaCards/Card';
 import Services from './Component/Services/Services';
+import Country from './Component/Country/Country';
+import Footer from './Component/Footer/Footer';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Banner />
         <Card/>
         <Services/>
+        <Country/>
+        <Footer/>
       </div>
     </>
   );
