@@ -42,6 +42,7 @@ const Sidenav = () => {
               <li
                 key={item}
                 className="cursor-pointer transition duration-300 hover:border-t-2 hover:border-b-2 border-black"
+
                 onClick={() => setIsOpen(false)}
               >
                 {item}
@@ -55,3 +56,4 @@ const Sidenav = () => {
 };
 
 export default Sidenav;
+

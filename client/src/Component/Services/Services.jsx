@@ -53,10 +53,12 @@ const Services = () => {
         {servicedata.map((service, index) => (
           <div
             key={index}
+
             className="flex flex-col gap-5 group cursor-pointer w-44 sm:w-52 shadow-2xl"
           >
             {/* Icon Box */}
             <div className="bg-gradient-to-r aspect-square flex items-center justify-center m-1 from-gray-100 to-gray-300">
+
               <img
                 src={service.img}
                 alt={`${service.title} Icon`}
@@ -65,12 +67,16 @@ const Services = () => {
             </div>
 
             {/* Text + Arrow */}
+
             <div className="flex flex-row place-items-center m-1 gap-3">
+
               <div className="flex flex-col gap-1">
                 <p className="font-semibold text-lg sm:text-xl relative after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:absolute after:origin-bottom-left after:transform after:ease-in-out after:duration-500 w-full after:w-full group-hover:after:scale-x-100 group-hover:after:origin-bottom-left after:bg-lime-600 text-gray-600">
                   {service.title}
                 </p>
+
                 <p className="text-sm text-gray-500">{service.desc}</p>
+
               </div>
             </div>
           </div>
@@ -87,7 +93,9 @@ const Services = () => {
         </button>
       </div>
     </div>
+
   )
 }
 
 export default Services
+
