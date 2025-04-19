@@ -19,7 +19,9 @@ function App() {
         <Card />
         <Services />
         <Country/>
+
       </main>
+=======
         <Footer/>
     </div>
   );
