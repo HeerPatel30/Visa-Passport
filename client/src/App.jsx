@@ -21,7 +21,7 @@ function App() {
         <Country/>
 
       </main>
-=======
+
         <Footer/>
     </div>
   );
