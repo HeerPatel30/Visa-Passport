@@ -1,6 +1,3 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
 import './App.css';
 import Sidenav from './Component/Navbar/Sidenav';
 import Banner from './Component/HeroBanner/Banner';
@@ -9,19 +6,24 @@ import Services from './Component/Services/Services';
 import Country from './Component/Country/Country';
 import Footer from './Component/Footer/Footer';
 
+
 function App() {
   return (
-    <>
+    <div className="min-h-screen overflow-x-hidden bg-gray-50">
+      {/* Top Navbar */}
       <Sidenav />
-      <div className="pt-10 md:pt-6 lg:pt-10">
+
+      {/* Main Content */}
+      <main className="pt-20 px-4 sm:px-6 md:px-8 space-y-6">
         <Banner />
-        <Card/>
-        <Services/>
+        <Card />
+        <Services />
         <Country/>
+       </main>
         <Footer/>
-      </div>
-    </>
+    </div>
   );
 }
 
 export default App;
+
