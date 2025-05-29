@@ -1,16 +1,19 @@
 import React from "react";
 import visa from "../../assets/visa-pass.avif";
 import { FaMapLocation } from "react-icons/fa6";
-import { FaBookAtlas } from "react-icons/fa6"
+import { FaBookAtlas } from "react-icons/fa6";
 import { FaTicketAlt } from "react-icons/fa";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import { MdCall } from "react-icons/md";
+import Services from "../Services/Services";
+import { useLocation } from "react-router-dom";
 const About = () => {
+  const location = useLocation();
+  const isAboutPage = location.pathname === "/about";
   return (
     <div>
       <div className="flex flex-row  flex-wrap  gap-[120px] my-11 ">
-        <div
-          className="rounded-sm w-[500px] p-4 bg-blue-50 flex items-center">
+        <div className="rounded-sm w-[500px] p-4 bg-blue-50 flex items-center">
           <img src={visa} alt="" srcset="" className="w-[450px] h-[400px]" />
         </div>
         <div>
@@ -42,69 +45,72 @@ const About = () => {
           </div>
           <div className="flex flex-row flex-wrap gap-5">
             <h1 className="flex flex-row gap-2 text-xl">
-            <FaMapLocation className="text-5xl text-red-600"/>
-            <span className="font-semibold text-blue-950">
-                Best Immigration<br/>
-                 Resources
-
-            </span>
+              <FaMapLocation className="text-5xl text-red-600" />
+              <span className="font-semibold text-blue-950">
+                Best Immigration
+                <br />
+                Resources
+              </span>
             </h1>
             <h1 className="flex flex-row gap-2 text-xl">
-            <FaBookAtlas className="text-5xl text-red-600"/>
-            <span className="font-semibold text-blue-950">
-            Return Visas Availabile
-            </span>
+              <FaBookAtlas className="text-5xl text-red-600" />
+              <span className="font-semibold text-blue-950">
+                Return Visas Availabile
+              </span>
             </h1>
           </div>
           <div className="flex flex-r gap-16 my-5 place-items-center ">
-             <div className=" flex flex-col bg-blue-100 w-[150px] h-[180px] rounded-xl items-center" >
-                    <div className="text-7xl text-blue-950">
-                    <FaTicketAlt />
-                    </div> 
-                    <div>
-                        <h1 className="text-4xl  text-blue-950 font-bold">34 <br />
-                        <p className=" text-xs my-2 font-semibold text-gray-600">Years of <br /> Expriences</p>
-                        </h1> 
-                    </div>
-             </div>
-             <div>
-                <ul >
-                    <li className="my-2 flex flex-row items-center gap-2"><IoMdCheckmarkCircle  className="text-2xl text-red-500"/>
-                    <span className="text-blue-950 font-bold">
-
+            <div className=" flex flex-col bg-blue-100 w-[150px] h-[180px] rounded-xl items-center">
+              <div className="text-7xl text-blue-950">
+                <FaTicketAlt />
+              </div>
+              <div>
+                <h1 className="text-4xl  text-blue-950 font-bold">
+                  34 <br />
+                  <p className=" text-xs my-2 font-semibold text-gray-600">
+                    Years of <br /> Expriences
+                  </p>
+                </h1>
+              </div>
+            </div>
+            <div>
+              <ul>
+                <li className="my-2 flex flex-row items-center gap-2">
+                  <IoMdCheckmarkCircle className="text-2xl text-red-500" />
+                  <span className="text-blue-950 font-bold">
                     Offer 100 % Genuine Assistance
-                    </span>
-                    </li>
-                    <li className="my-2 flex flex-row items-center gap-2"><IoMdCheckmarkCircle  className="text-2xl text-red-500"/>
-                    <span className="text-blue-950 font-bold">
-
+                  </span>
+                </li>
+                <li className="my-2 flex flex-row items-center gap-2">
+                  <IoMdCheckmarkCircle className="text-2xl text-red-500" />
+                  <span className="text-blue-950 font-bold">
                     It’s Faster & Reliable Execution
-                    </span>
-                    </li>
-                    <li className="my-2 flex flex-row items-center gap-2"><IoMdCheckmarkCircle  className="text-2xl text-red-500"/>
-                    <span className="text-blue-950 font-bold">
-
+                  </span>
+                </li>
+                <li className="my-2 flex flex-row items-center gap-2">
+                  <IoMdCheckmarkCircle className="text-2xl text-red-500" />
+                  <span className="text-blue-950 font-bold">
                     Accurate & Expert Advice
-                    </span>
-                    </li>
-                    <li className="my-5 flex flex-row items-center gap-2">
-                    <MdCall className="text-6xl"/>
-                    <span className="gap-2 text-blue-950 font-bold"> 
-                    Have any questions?<br />
+                  </span>
+                </li>
+                <li className="my-5 flex flex-row items-center gap-2">
+                  <MdCall className="text-6xl" />
+                  <span className="gap-2 text-blue-950 font-bold">
+                    Have any questions?
+                    <br />
                     <p className="text-2xl text-red-500">
-                        Free: +0123 456 7890 
-                        </p> 
-                    </span>
-                    </li>
-                </ul>
-             </div>
+                      Free: +0123 456 7890
+                    </p>
+                  </span>
+                </li>
+              </ul>
+            </div>
 
-             <div>
-
-             </div>
+            <div></div>
           </div>
         </div>
       </div>
+       {isAboutPage && <Services />}
     </div>
   );
 };
