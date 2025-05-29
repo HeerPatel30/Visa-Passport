@@ -94,3 +94,7 @@ const Services = () => {
 };
 
 export default Services;
+<<<<<<< HEAD
+=======
+      {/* Heading */}
+>>>>>>> 6f37cdb (basic routing)

@@ -13,6 +13,7 @@ import ContactUs from './Component/Contact/Contact';
 function App() {
   return (
     <Router>
+<<<<<<< HEAD
       <div className="min-h-screen overflow-x-hidden bg-gray-50">
         {/* Top Navbar */}
         <Sidenav />
@@ -26,6 +27,21 @@ function App() {
                 <About />
                 <Card />
                 <Services />
+=======
+    <div className="min-h-screen overflow-x-hidden bg-gray-50">
+      {/* Top Navbar */}
+      <Sidenav />
+
+      {/* Main Content */}
+      <main className="pt-20 px-4 sm:px-6 md:px-8 space-y-6">
+          <Routes>
+            <Route path="/" element={
+              <>
+        <Banner />
+                <About />
+        <Card />
+        <Services />
+>>>>>>> 6f37cdb (basic routing)
                 <Country />
               </>
             } />
@@ -37,10 +53,17 @@ function App() {
             <Route path="/countries" element={<Country />} />
             <Route path="/contactus" element={<ContactUs />} />
           </Routes>
+<<<<<<< HEAD
         </main>
 
         <Footer />
       </div>
+=======
+      </main>
+
+        <Footer />
+    </div>
+>>>>>>> 6f37cdb (basic routing)
     </Router>
   );
 }
