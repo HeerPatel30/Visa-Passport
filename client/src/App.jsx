@@ -8,12 +8,13 @@ import Services from "./Component/Services/Services";
 import Country from "./Component/Country/Country";
 import Footer from "./Component/Footer/Footer";
 import About from "./Component/Aboutus/About";
-import ContactUs from "./Component/Contact/Contact";
+import ContactUs from "./Component/Contact/Contact"
+import PassportApplicationForm from "./Component/Passportform/Passport";
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen overflow-x-hidden bg-gray-50">
+      <div className="min-h-screen overflow-x-hidden bg-gray-50 ">
         {/* Top Navbar */}
         <Sidenav />
 
@@ -39,6 +40,7 @@ function App() {
             <Route path="/visa-cards" element={<Card />} />
             <Route path="/countries" element={<Country />} />
             <Route path="/contactus" element={<ContactUs />} />
+            <Route path="/passportform" element={<PassportApplicationForm />} />
           </Routes>
         </main>
 
