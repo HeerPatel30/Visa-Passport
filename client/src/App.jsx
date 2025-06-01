@@ -34,6 +34,19 @@ function App() {
               }
             />
 
+            <Route
+              path="/"
+              element={
+                <>
+                  <Banner />
+                  <About />
+                  <Card />
+                  <Services />
+                  <Country />
+                </>
+              }
+            />
+
             {/* You can add more routes like this */}
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
