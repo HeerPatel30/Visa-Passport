@@ -12,7 +12,7 @@ const About = () => {
   const isAboutPage = location.pathname === "/about";
   return (
     <div>
-      <div className="flex flex-row  flex-wrap  gap-[120px] my-11 ">
+      <div className="flex flex-row  flex-wrap  gap-[100px] items-center my-11 ">
         <div className="rounded-sm w-[500px] p-4 bg-blue-50 flex items-center">
           <img src={visa} alt="" srcset="" className="w-[450px] h-[400px]" />
         </div>
