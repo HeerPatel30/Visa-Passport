@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 export default function auth(req, res, next) {
-  const token = req.headers.token
-
+  let token = req.headers.token 
   if (!token) {
     return res.status(401).json({
       message: "No token provided",
@@ -17,7 +16,7 @@ export default function auth(req, res, next) {
         status: 403,
       });
     }
-    
+
     // Save the decoded information for use in other routes
     req.user = decoded;
     next();

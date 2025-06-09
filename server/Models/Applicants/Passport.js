@@ -4,7 +4,7 @@ const passportSchema = new mongoose.Schema(
   {
     //  code for passport application
     code: { type: String },
-    // 1. Personal Information
+    // 1. Personal QAA
     firstname: { type: String, required: true },
     middlename: { type: String },
     lastname: { type: String, required: true },
@@ -12,6 +12,9 @@ const passportSchema = new mongoose.Schema(
     dob: { type: String, required: true },
     placeofbirth: { type: String, required: true },
     nationality: { type: String, default: "Indian" },
+    city: { type: String },
+    state: { type: String },
+    country: { type: String },
     maritalstatus: {
       type: String,
     },

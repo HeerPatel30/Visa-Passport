@@ -1,136 +1,462 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import pass from "../../assets/pass.jpg";
 
-const steps = [
-  "Personal Info",
-  "Passport Details",
-  "Documents & Emergency",
-  "Review",
-];
+export default function PassportForm() {
+  const steps = [
+    "Personal Info",
+    "Contact Info",
+    "Address",
+    "Family",
+    "Work/Study",
+    "Passport",
+    "Declaration",
+    "Review",
+  ];
 
-export default function PassportApplicationForm() {
   const [step, setStep] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
+  const [notification, setNotification] = useState({ message: "", type: "" }); // notification state
 
   const handleChange = (e) => {
-    const { name, value, type, files, checked } = e.target;
-    const val = type === "file" ? files[0] : type === "checkbox" ? checked : value;
-    setFormData({ ...formData, [name]: val });
+    const { name, value, files, type } = e.target;
+    if (type === "file") {
+      if (e.target.multiple) {
+        setFormData({ ...formData, [name]: files });
+      } else {
+        setFormData({ ...formData, [name]: files[0] });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const simulateLoad = (callback) => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      callback();
-    }, 400);
+  const validateStep = () => {
+    let stepErrors = {};
+    switch (step) {
+      case 0: // Personal Info
+        if (!formData.firstname) stepErrors.firstname = "First name is required";
+        if (!formData.lastname) stepErrors.lastname = "Last name is required";
+        if (!formData.gender) stepErrors.gender = "Gender is required";
+        if (!formData.dob) stepErrors.dob = "Date of birth is required";
+        if (!formData.placeofbirth) stepErrors.placeofbirth = "Place of birth is required";
+        break;
+
+      case 1: // Contact Info
+        if (!formData.email) stepErrors.email = "Email is required";
+        else if (!/\S+@\S+\.\S+/.test(formData.email))
+          stepErrors.email = "Email is invalid";
+        if (!formData.phone) stepErrors.phone = "Phone number is required";
+        else if (!/^\d{10}$/.test(formData.phone))
+          stepErrors.phone = "Phone number must be 10 digits";
+        break;
+
+      case 2: // Address
+        if (!formData.presentAddress) stepErrors.presentAddress = "Present address is required";
+        if (!formData.permanentAddress) stepErrors.permanentAddress = "Permanent address is required";
+        if (!formData.city) stepErrors.city = "City is required";
+        if (!formData.state) stepErrors.state = "State is required";
+        if (!formData.country) stepErrors.country = "Country is required";
+        break;
+
+      case 3: // Family
+        if (!formData.fatherName) stepErrors.fatherName = "Father's name is required";
+        if (!formData.motherName) stepErrors.motherName = "Mother's name is required";
+        break;
+
+      case 4: // Work/Study
+        if (!formData.occupation) stepErrors.occupation = "Occupation is required";
+        break;
+
+      case 5: // Passport docs
+        if (!formData.bookletType) stepErrors.bookletType = "Booklet type is required";
+        if (!formData.aadhaarCard) stepErrors.aadhaarCard = "Aadhaar card is required";
+        if (!formData.dobProof) stepErrors.dobProof = "DOB proof is required";
+        if (!formData.addressProof) stepErrors.addressProof = "Address proof is required";
+        if (!formData.photo) stepErrors.photo = "Photo is required";
+        if (!formData.signature) stepErrors.signature = "Signature is required";
+        break;
+
+      case 6: // Declaration
+        if (!formData.declarationAgreed || formData.declarationAgreed !== "Yes") {
+          stepErrors.declarationAgreed = "You must agree to the declaration";
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    setErrors(stepErrors);
+    return Object.keys(stepErrors).length === 0;
   };
 
-  const next = () => simulateLoad(() => setStep((prev) => Math.min(prev + 1, steps.length - 1)));
-  const back = () => simulateLoad(() => setStep((prev) => Math.max(prev - 1, 0)));
+  const nextStep = () => {
+    if (validateStep()) {
+      setStep((prev) => Math.min(prev + 1, steps.length - 1));
+    }
+  };
 
-  const progress = ((step + 1) / steps.length) * 100;
+  const prevStep = () => setStep((prev) => Math.max(prev - 1, 0));
 
-  const fieldStyle = "w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400";
+  const handleSubmit = async () => {
+    if (!validateStep()) return;
+
+    const form = new FormData();
+
+    for (const key in formData) {
+      const value = formData[key];
+      if (!(value instanceof File) && !Array.isArray(value)) {
+        form.append(key, value);
+      }
+    }
+
+    const fileFields = ["aadhaarCard", "dobProof", "addressProof", "photo", "signature"];
+    fileFields.forEach((field) => {
+      if (formData[field]) {
+        form.append(field, formData[field]);
+      }
+    });
+
+    if (formData.others && formData.others.length > 0) {
+      Array.from(formData.others).forEach((file) => {
+        form.append("others", file);
+      });
+    }
+
+    try {
+      const response = await fetch("http://localhost:3031/passport/add", {
+        method: "POST",
+        body: form,
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (result.status === "success") {
+        setNotification({ message: result.message || "Passport application submitted successfully!", type: "success" });
+        setFormData({});
+        setStep(0);
+      } else {
+        setNotification({ message: result.message || "Failed to submit application.", type: "error" });
+        console.error(result);
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      setNotification({ message: "Something went wrong!", type: "error" });
+    }
+  };
+
+  // Auto-dismiss notification after 3 seconds
+  useEffect(() => {
+    if (notification.message) {
+      const timer = setTimeout(() => {
+        setNotification({ message: "", type: "" });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const renderStep = () => {
+    const error = errors;
     switch (step) {
       case 0:
         return (
-          <motion.div key={step} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-            <input name="fullName" onChange={handleChange} placeholder="Full Name" className={fieldStyle} />
-            <input name="dob" type="date" onChange={handleChange} className={fieldStyle} />
-            <input name="email" placeholder="Email Address" onChange={handleChange} className={fieldStyle} />
-            <input name="mobile" placeholder="Mobile Number" onChange={handleChange} className={fieldStyle} />
-            <input name="fatherName" placeholder="Father's Name" onChange={handleChange} className={fieldStyle} />
-            <input name="motherName" placeholder="Mother's Name" onChange={handleChange} className={fieldStyle} />
-            <input name="presentAddress" placeholder="Present Address" onChange={handleChange} className={fieldStyle} />
-            <input name="city" placeholder="City" onChange={handleChange} className={fieldStyle} />
-          </motion.div>
+          <div className="grid gap-4">
+            <input
+              name="firstname"
+              placeholder="First Name"
+              onChange={handleChange}
+              className="input"
+            />
+            {error.firstname && <p className="text-red-500 text-sm">{error.firstname}</p>}
+
+            <input
+              name="middlename"
+              placeholder="Middle Name"
+              onChange={handleChange}
+              className="input"
+            />
+
+            <input
+              name="lastname"
+              placeholder="Last Name"
+              onChange={handleChange}
+              className="input"
+            />
+            {error.lastname && <p className="text-red-500 text-sm">{error.lastname}</p>}
+
+            <select
+              name="gender"
+              onChange={handleChange}
+              className="input"
+              defaultValue=""
+            >
+              <option value="" disabled>
+                Select Gender
+              </option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+            {error.gender && <p className="text-red-500 text-sm">{error.gender}</p>}
+
+            <input name="dob" type="date" onChange={handleChange} className="input" />
+            {error.dob && <p className="text-red-500 text-sm">{error.dob}</p>}
+
+            <input
+              name="placeofbirth"
+              placeholder="Place of Birth"
+              onChange={handleChange}
+              className="input"
+            />
+            {error.placeofbirth && (
+              <p className="text-red-500 text-sm">{error.placeofbirth}</p>
+            )}
+          </div>
         );
+
       case 1:
         return (
-          <motion.div key={step} initial={{ x: 300, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -300, opacity: 0 }} className="space-y-4">
-            <select name="passportType" onChange={handleChange} className={fieldStyle}>
-              <option value="">Passport Type</option>
-              <option value="fresh">Fresh</option>
-              <option value="reissue">Reissue</option>
-            </select>
-            <select name="bookletType" onChange={handleChange} className={fieldStyle}>
-              <option value="">Booklet Type</option>
-              <option value="36">36 Pages</option>
-              <option value="60">60 Pages</option>
-            </select>
-          </motion.div>
+          <div className="grid gap-4">
+            <input name="email" placeholder="Email" onChange={handleChange} className="input" />
+            {error.email && <p className="text-red-500 text-sm">{error.email}</p>}
+
+            <input name="phone" placeholder="Phone Number" onChange={handleChange} className="input" />
+            {error.phone && <p className="text-red-500 text-sm">{error.phone}</p>}
+
+            <input
+              name="alternatePhone"
+              placeholder="Alternate Phone"
+              onChange={handleChange}
+              className="input"
+            />
+          </div>
         );
+
       case 2:
         return (
-          <motion.div key={step} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="space-y-4">
-            <input type="file" name="identityProof" onChange={handleChange} className={fieldStyle} />
-            <input type="file" name="addressProof" onChange={handleChange} className={fieldStyle} />
-            <input name="emergencyName" placeholder="Emergency Contact Name" onChange={handleChange} className={fieldStyle} />
-            <input name="emergencyPhone" placeholder="Emergency Phone" onChange={handleChange} className={fieldStyle} />
-            <label className="flex items-center space-x-2">
-              <input type="checkbox" name="declaration" onChange={handleChange} className="accent-blue-500" />
-              <span>I declare that all information is correct.</span>
-            </label>
-          </motion.div>
+          <div className="grid gap-4">
+            <input
+              name="presentAddress"
+              placeholder="Present Address"
+              onChange={handleChange}
+              className="input"
+            />
+            {error.presentAddress && (
+              <p className="text-red-500 text-sm">{error.presentAddress}</p>
+            )}
+
+            <input
+              name="permanentAddress"
+              placeholder="Permanent Address"
+              onChange={handleChange}
+              className="input"
+            />
+            {error.permanentAddress && (
+              <p className="text-red-500 text-sm">{error.permanentAddress}</p>
+            )}
+
+            <input name="city" placeholder="City" onChange={handleChange} className="input" />
+            {error.city && <p className="text-red-500 text-sm">{error.city}</p>}
+
+            <input name="state" placeholder="State" onChange={handleChange} className="input" />
+            {error.state && <p className="text-red-500 text-sm">{error.state}</p>}
+
+            <input name="country" placeholder="Country" onChange={handleChange} className="input" />
+            {error.country && <p className="text-red-500 text-sm">{error.country}</p>}
+          </div>
         );
+
       case 3:
         return (
-          <motion.div key={step} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-sm max-h-[400px] overflow-auto">
-            <pre className="whitespace-pre-wrap bg-gray-100 p-4 rounded-xl">
-              {JSON.stringify(formData, null, 2)}
-            </pre>
-          </motion.div>
+          <div className="grid gap-4">
+            <input
+              name="fatherName"
+              placeholder="Father's Name"
+              onChange={handleChange}
+              className="input"
+            />
+            {error.fatherName && <p className="text-red-500 text-sm">{error.fatherName}</p>}
+
+            <input
+              name="motherName"
+              placeholder="Mother's Name"
+              onChange={handleChange}
+              className="input"
+            />
+            {error.motherName && <p className="text-red-500 text-sm">{error.motherName}</p>}
+
+            <input
+              name="spouseName"
+              placeholder="Spouse Name (if any)"
+              onChange={handleChange}
+              className="input"
+            />
+          </div>
         );
+
+      case 4:
+        return (
+          <div className="grid gap-4">
+            <input
+              name="occupation"
+              placeholder="Occupation"
+              onChange={handleChange}
+              className="input"
+            />
+            {error.occupation && <p className="text-red-500 text-sm">{error.occupation}</p>}
+
+            <input
+              name="organization"
+              placeholder="Organization"
+              onChange={handleChange}
+              className="input"
+            />
+            <input
+              name="designation"
+              placeholder="Designation"
+              onChange={handleChange}
+              className="input"
+            />
+          </div>
+        );
+
+      case 5:
+        return (
+          <div className="grid gap-4">
+            <input
+              name="bookletType"
+              placeholder="Booklet Type"
+              onChange={handleChange}
+              className="input"
+            />
+            {error.bookletType && <p className="text-red-500 text-sm">{error.bookletType}</p>}
+
+            <label>Aadhaar Card:</label>
+            <input type="file" name="aadhaarCard" onChange={handleChange} className="input" />
+            {error.aadhaarCard && <p className="text-red-500 text-sm">{error.aadhaarCard}</p>}
+
+            <label>DOB Proof:</label>
+            <input type="file" name="dobProof" onChange={handleChange} className="input" />
+            {error.dobProof && <p className="text-red-500 text-sm">{error.dobProof}</p>}
+
+            <label>Address Proof:</label>
+            <input type="file" name="addressProof" onChange={handleChange} className="input" />
+            {error.addressProof && <p className="text-red-500 text-sm">{error.addressProof}</p>}
+
+            <label>Photo:</label>
+            <input type="file" name="photo" onChange={handleChange} className="input" />
+            {error.photo && <p className="text-red-500 text-sm">{error.photo}</p>}
+
+            <label>Signature:</label>
+            <input type="file" name="signature" onChange={handleChange} className="input" />
+            {error.signature && <p className="text-red-500 text-sm">{error.signature}</p>}
+
+            <label>Other Documents:</label>
+            <input type="file" name="others" multiple onChange={handleChange} className="input" />
+          </div>
+        );
+
+      case 6:
+        return (
+          <div className="grid gap-4">
+            <label>Do you agree to the declaration?</label>
+            <select
+              name="declarationAgreed"
+              onChange={handleChange}
+              className="input"
+              defaultValue=""
+            >
+              <option value="" disabled>
+                Select
+              </option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+            {error.declarationAgreed && (
+              <p className="text-red-500 text-sm">{error.declarationAgreed}</p>
+            )}
+          </div>
+        );
+
+      case 7:
+        return (
+          <div className="grid gap-2 text-sm max-h-[60vh] overflow-auto">
+            {Object.entries(formData).map(([key, value]) => (
+              <div key={key} className="border-b py-1">
+                <strong>{key}: </strong>
+                {value instanceof File
+                  ? value.name
+                  : Array.isArray(value)
+                  ? [...value].map((file) => file.name).join(", ")
+                  : value?.toString()}
+              </div>
+            ))}
+          </div>
+        );
+
       default:
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center px-4 py-10">
-      <div className="relative max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row items-center md:items-start">
-        <div className="hidden md:block w-1/2 bg-blue-100 p-10">
-          <img src="https://cdni.iconscout.com/illustration/premium/thumb/passport-application-7146042-5803749.png" alt="3D sticker" className="w-full h-auto" />
-          <h2 className="text-3xl font-bold text-center mt-6 text-gray-700">Apply for Passport</h2>
+    <div
+      className="min-h-screen bg-cover bg-center flex items-center justify-center"
+      style={{ backgroundImage: `url(${pass})` }}
+    >
+      {/* Notification */}
+      {notification.message && (
+        <div
+          className={`fixed top-4 right-4 px-4 py-3 rounded shadow-md text-white cursor-pointer z-50 ${
+            notification.type === "success" ? "bg-green-500" : "bg-red-500"
+          }`}
+          role="alert"
+          onClick={() => setNotification({ message: "", type: "" })}
+        >
+          {notification.message}
         </div>
+      )}
 
-        <div className="w-full md:w-1/2 p-6 md:p-10">
-          <div className="mb-6">
-            <p className="text-gray-600 font-medium text-sm mb-1">Step {step + 1} of {steps.length}: {steps[step]}</p>
-            <div className="w-full bg-gray-200 h-2 rounded-full">
-              <div className="h-2 bg-blue-600 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
-            </div>
-          </div>
+      <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-6">Passport Application</h2>
 
-          <AnimatePresence mode="wait">{loading ? (
-            <div className="flex justify-center py-10">
-              <div className="w-10 h-10 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-            </div>
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.4 }}
+        >
+          {renderStep()}
+        </motion.div>
+
+        <div className="flex justify-between mt-6">
+          <button
+            onClick={prevStep}
+            disabled={step === 0}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded"
+          >
+            Back
+          </button>
+
+          {step === steps.length - 1 ? (
+            <button
+              onClick={handleSubmit}
+              className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
+            >
+              Submit
+            </button>
           ) : (
-            renderStep()
-          )}</AnimatePresence>
-
-          {!loading && (
-            <div className="mt-6 flex justify-between">
-              {step > 0 && (
-                <button onClick={back} className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-xl transition">
-                  Back
-                </button>
-              )}
-              {step < steps.length - 1 ? (
-                <button onClick={next} className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-xl transition">
-                  Next
-                </button>
-              ) : (
-                <button onClick={() => alert("Form submitted!")} className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-xl transition">
-                  Submit
-                </button>
-              )}
-            </div>
+            <button
+              onClick={nextStep}
+              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+            >
+              {step === steps.length - 2 ? "Review" : "Next"}
+            </button>
           )}
         </div>
       </div>
