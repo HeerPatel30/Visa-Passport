@@ -10,6 +10,7 @@ import Footer from "./Component/Footer/Footer";
 import About from "./Component/Aboutus/About";
 import ContactUs from "./Component/Contact/Contact"
 import PassportApplicationForm from "./Component/Passportform/Passport";
+import Dashboard from "./Component/Dashboard/Dashboard";
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
             <Route path="/countries" element={<Country />} />
             <Route path="/contactus" element={<ContactUs />} />
             <Route path="/passportform" element={<PassportApplicationForm />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </main>
 

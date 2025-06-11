@@ -305,12 +305,14 @@ const chartandcount = async (req,res,next)=>{
            }
         }
       ]
+      let totalcount = await PassportApplication.countDocuments();
       let data = await PassportApplication.aggregate(pipeline)
       if (data.length > 0) {
         ResponseBody = {
           message: "Data fetched successfully",
           status: 200,
-          data: data
+          data: data ,
+          total: totalcount,
         }
         return res.status(200).json(ResponseBody);
       } else {
