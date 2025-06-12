@@ -11,6 +11,7 @@ import About from "./Component/Aboutus/About";
 import ContactUs from "./Component/Contact/Contact"
 import PassportApplicationForm from "./Component/Passportform/Passport";
 import Dashboard from "./Component/Dashboard/Dashboard";
+import LoginPage from "./Component/Login/Login";
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
             <Route path="/contactus" element={<ContactUs />} />
             <Route path="/passportform" element={<PassportApplicationForm />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/login" element={<LoginPage />} />
           </Routes>
         </main>
 
