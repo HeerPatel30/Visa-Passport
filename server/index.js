@@ -12,7 +12,7 @@ const app = express();
 // Enable CORS early, before routes
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin:[ "http://localhost:5173" ,"https://visa-passport.vercel.app/" ], 
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
     exposedHeaders: ["token", "uid", "unqkey"],

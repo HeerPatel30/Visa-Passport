@@ -20,7 +20,7 @@ export default function PassportList() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("http://localhost:3031/admin/passportlist", {
+      const res = await fetch("https://visa-passport.onrender.com/admin/passportlist", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +86,7 @@ export default function PassportList() {
 
   const handleStatusChange = async (_id, newStatus) => {
     try {
-      const res = await fetch("http://localhost:3031/admin/passportupdate", {
+      const res = await fetch("https://visa-passport.onrender.com/admin/passportupdate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -116,7 +116,7 @@ export default function PassportList() {
     if (!window.confirm("Are you sure you want to delete this application?")) return;
 
     try {
-      const res = await fetch("http://localhost:3031/admin/passportdelete", {
+      const res = await fetch("https://visa-passport.onrender.com/admin/passportdelete", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

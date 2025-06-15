@@ -48,7 +48,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:3031/admin/chart", {
+        const res = await fetch("https://visa-passport.onrender.com/admin/chart", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
