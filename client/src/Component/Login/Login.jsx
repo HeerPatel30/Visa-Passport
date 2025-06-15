@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import loginBg from "../../assets/login.webp"; // full background image
+import { useNavigate } from "react-router-dom";
+import loginBg from "../../assets/login.webp";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
   const [formdata, setFormData] = useState({
     code: "",
     password: ""
   });
 
   const [notification, setNotification] = useState({
-    type: "", // 'success' or 'error'
+    type: "",
     message: ""
   });
 
@@ -34,10 +37,25 @@ export default function LoginPage() {
       const ResponseBody = await response.json();
 
       if (ResponseBody.status) {
+        // Extract from headers
+        const token = response.headers.get("token");
+        const uid = response.headers.get("uid");
+        const unqkey = response.headers.get("unqkey");
+
+        // Save to localStorage for future API calls
+        localStorage.setItem("token", token);
+        localStorage.setItem("uid", uid);
+        localStorage.setItem("unqkey", unqkey);
+
         setNotification({
           type: "success",
           message: ResponseBody.message || "Login successful!"
         });
+
+        // Redirect after short delay
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
       } else {
         setNotification({
           type: "error",

@@ -10,11 +10,14 @@ dotenv.config();
 const app = express();
 
 // Enable CORS early, before routes
-app.use(cors({
-  origin: "http://localhost:5173",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+    exposedHeaders: ["token", "uid", "unqkey"],
+  })
+);
 
 // Body parsers must be before routes too
 app.use(express.json());

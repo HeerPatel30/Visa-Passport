@@ -9,6 +9,7 @@ const Sidenav = () => {
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
     { name: "Service", path: "/services" },
+    { name: "Login", path: "/login" },
     { name: "Contact", path: "/contactus" }, // You'll need a Contact page if not already added
   ];
 

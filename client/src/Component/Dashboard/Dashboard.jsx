@@ -7,6 +7,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import PassportList from "./passportlist";
 
 // Generate pastel colors dynamically
 const getColors = (count) => {
@@ -51,10 +52,9 @@ const Dashboard = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            token:
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODNkZTgxMmZkYTY0ZjVmNjIzZWFhNTYiLCJ1bnEiOiJTN1RqS1ppWXpGdzQiLCJpYXQiOjE3NDk2NjE2NjIsImV4cCI6MTc0OTc0ODA2Mn0.Kcnlh7EQ2TZN5riNMULJ7Vp7reyxaZJH1CJJIeTIF20",
-            uid: "683de812fda64f5f623eaa56",
-            unqkey: "S7TjKZiYzFw4",
+            token: localStorage.getItem("token"),
+            uid: localStorage.getItem("uid"),
+            unqkey: localStorage.getItem("unqkey"),
           },
         });
 
@@ -77,38 +77,43 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-white shadow-xl rounded-2xl max-w-4xl mx-auto mt-10">
-      <h2 className="text-2xl font-bold text-center mb-6 text-blue-800">
-        Application Status Overview
-      </h2>
-      <ResponsiveContainer width="100%" height={400}>
-        <PieChart>
-          <Pie
-            data={chartData}
-            cx="50%"
-            cy="50%"
-            outerRadius={110}
-            fill="#8884d8"
-            dataKey="value"
-            nameKey="name"
-            labelLine
-            label={renderCustomizedLabel}
-            isAnimationActive={true}
-            animationDuration={1000}
-          >
-            {chartData.map((_, index) => (
-              <Cell key={`cell-${index}`} fill={colors[index]} />
-            ))}
-          </Pie>
-          <Tooltip contentStyle={{ fontSize: "14px" }} />
-          <Legend
-            layout="horizontal"
-            verticalAlign="bottom"
-            align="center"
-            iconType="circle"
-          />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <div className="p-6 bg-white shadow-xl rounded-2xl max-w-4xl mx-auto mt-10">
+        <h2 className="text-2xl font-bold text-center mb-6 text-blue-800">
+          Application Status Overview
+        </h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <PieChart>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              outerRadius={110}
+              fill="#8884d8"
+              dataKey="value"
+              nameKey="name"
+              labelLine
+              label={renderCustomizedLabel}
+              isAnimationActive={true}
+              animationDuration={1000}
+            >
+              {chartData.map((_, index) => (
+                <Cell key={`cell-${index}`} fill={colors[index]} />
+              ))}
+            </Pie>
+            <Tooltip contentStyle={{ fontSize: "14px" }} />
+            <Legend
+              layout="horizontal"
+              verticalAlign="bottom"
+              align="center"
+              iconType="circle"
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <div>
+        <PassportList />
+      </div>
     </div>
   );
 };
