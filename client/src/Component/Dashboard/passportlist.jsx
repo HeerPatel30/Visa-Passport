@@ -112,6 +112,36 @@ export default function PassportList() {
     }
   };
 
+  const handleDelete = async (_id) => {
+    if (!window.confirm("Are you sure you want to delete this application?")) return;
+
+    try {
+      const res = await fetch("http://localhost:3031/admin/passportdelete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+          uid: localStorage.getItem("uid"),
+          unqkey: localStorage.getItem("unqkey"),
+        },
+        body: JSON.stringify({ _id }),
+      });
+
+      const result = await res.json();
+
+      if (result.status === 200) {
+        showNotification(result.message || "Application deleted successfully", "success");
+        setPage(1);
+        fetchData();
+      } else {
+        showNotification(result.message || "Failed to delete application", "error");
+      }
+    } catch (err) {
+      console.error("Delete failed", err);
+      showNotification("Error deleting application", "error");
+    }
+  };
+
   const totalPages = Math.ceil(totalCount / limit);
 
   return (
@@ -255,8 +285,8 @@ export default function PassportList() {
                     View
                   </button>
                   <button
+                    onClick={() => handleDelete(item._id)}
                     className="bg-red-500 text-white text-xs px-2 py-1 rounded"
-                    onClick={() => alert("Delete logic here")}
                   >
                     Delete
                   </button>
@@ -324,9 +354,7 @@ export default function PassportList() {
                 Designation: selectedApplication.designation,
                 BookletType: selectedApplication.bookletType,
                 Status: selectedApplication.status,
-                SubmissionDate: new Date(
-                  selectedApplication.submissionDate
-                ).toLocaleString(),
+                SubmissionDate: new Date(selectedApplication.submissionDate).toLocaleString(),
               }).map(([label, value]) => (
                 <p key={label}>
                   <strong>{label}:</strong> {value || "N/A"}
@@ -337,39 +365,38 @@ export default function PassportList() {
             <div className="mt-4">
               <h4 className="font-semibold mb-2">Documents</h4>
               <ul className="list-disc list-inside text-sm space-y-1">
-                {Object.entries(selectedApplication.documents || {}).map(
-                  ([key, value]) =>
-                    key === "others" ? (
-                      value.map((url, i) => (
-                        <li key={i}>
-                          Other Document {i + 1}:{" "}
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline"
-                          >
-                            View
-                          </a>
-                        </li>
-                      ))
-                    ) : (
-                      <li key={key}>
-                        {key.charAt(0).toUpperCase() + key.slice(1)}:{" "}
-                        {value ? (
-                          <a
-                            href={value}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline"
-                          >
-                            View
-                          </a>
-                        ) : (
-                          "Not Uploaded"
-                        )}
+                {Object.entries(selectedApplication.documents || {}).map(([key, value]) =>
+                  key === "others" ? (
+                    value.map((url, i) => (
+                      <li key={i}>
+                        Other Document {i + 1}:{" "}
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          View
+                        </a>
                       </li>
-                    )
+                    ))
+                  ) : (
+                    <li key={key}>
+                      {key.charAt(0).toUpperCase() + key.slice(1)}:{" "}
+                      {value ? (
+                        <a
+                          href={value}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          View
+                        </a>
+                      ) : (
+                        "Not Uploaded"
+                      )}
+                    </li>
+                  )
                 )}
               </ul>
             </div>

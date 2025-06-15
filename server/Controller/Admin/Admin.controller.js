@@ -144,6 +144,49 @@ const updateadmin = async (req, res, next) => {
   }
 }
 
+const deletepassport = async (req, res, next) => {
+  try {
+   let formdata = req.body ;
+   let ResponseBody = {}
+  
+      if (!formdata._id) {
+        return res.status(400).json({
+          message: "Passport ID is required",
+          status: 400,
+          data: [],
+        });
+      }
+  
+      const passport = await PassportApplication.findOne({ _id: new ObjectId(formdata._id) });
+  
+      if (!passport) {
+        return res.status(404).json({
+          message: "Passport not found",
+          status: 404,
+          data: [],
+        });
+      }
+  
+      await PassportApplication.deleteOne({ _id: new ObjectId(formdata._id) });
+  
+      ResponseBody = {
+        message: "Passport deleted successfully",
+        status: 200,
+        data: [],
+      };
+      return res.status(200).json(ResponseBody);
+
+  }
+  catch (error) {
+    console.error("Error in deletepassport:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      status: 500,
+      error: error.message,
+    });
+  }
+};
+
 const listpassport = async (req, res, next) => {
   try {
     const formdata = req.body;
@@ -334,4 +377,4 @@ const chartandcount = async (req,res,next)=>{
     });
   }
 }
-export { AddAdmin, AdminLogin, updateadmin, listpassport, adminpassportupdate, chartandcount };
+export { AddAdmin, AdminLogin, updateadmin, listpassport, adminpassportupdate, chartandcount , deletepassport };
