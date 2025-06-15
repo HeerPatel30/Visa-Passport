@@ -1,5 +1,4 @@
 server/package-lock.json
-server/package.json
 server/node_modules/.package-lock.json
 server/node_modules/@mongodb-js/saslprep/LICENSE
 server/node_modules/@mongodb-js/saslprep/package.json
