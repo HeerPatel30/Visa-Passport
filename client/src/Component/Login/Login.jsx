@@ -25,7 +25,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://visa-passport.onrender.comGIT/admin/login", {
+      const response = await fetch("https://visa-passport.onrender.com/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
