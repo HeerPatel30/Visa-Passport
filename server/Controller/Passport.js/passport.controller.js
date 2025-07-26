@@ -54,11 +54,11 @@ const addpassport = async (req, res, next) => {
     }
 };
 
-const updatepassport = async (req, res, next) => {
+const updatepassport = async (req, res) => {
     try {
         const formdata = req.body;
-        const files = req.files; // Assuming multer + cloudinary is used
-        let ResponseBody = {};
+        const files = req.files;
+        
 
         const existingPassport = await PassportApplication.findOne({ _id: new ObjectId(formdata._id) });
 
@@ -149,7 +149,62 @@ const listpassport = async (req, res, next) => {
         });
     }
 }
+const searchpassport = async (req, res, next) => {
+  try {
+    let formdata = req.body;
+    let ResponseBody = {};
+    let pipeline = [];
+    if (formdata.search) {
+      const searchableFields = [
+        "code",
+        "firstname",
+        "middlename",
+        "lastname",
+        "email",
+        "phone",
+        "alternatePhone",
+        "nationality",
+        "occupation",
+        "organization",
+        "designation",
+        "fatherName",
+        "motherName",
+        "spouseName",
+        "status",
+      ];
 
+      const orQuery = searchableFields.map((field) => ({
+        [field]: { $regex: formdata.search, $options: "i" },
+      }));
+
+      pipeline.push({ $match: { $or: orQuery } });
+    }
+    let data = await PassportApplication.aggregate(pipeline);
+    if (data.length === 0) {
+      ResponseBody = {
+        message: "No passport applications found",
+        status: 404,
+        data: [],
+      };
+      return res.status(404).json(ResponseBody);
+    } 
+    else {  
+        ResponseBody = {
+        message: "Passport applications found",
+        status: 200,
+        data: data,
+      };
+      return res.status(200).json(ResponseBody);
+    }
+  } catch (error) {
+    console.error("Search Passport Error:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      status: 500,
+      data: error.message,
+    });
+  }
+};
 const deletepassport = async (req,res,next)=>{
     try {
         let formdata = req.body 
@@ -197,4 +252,4 @@ const deletepassport = async (req,res,next)=>{
         });
     }
 }
-export { addpassport, updatepassport, listpassport, deletepassport };
+export { addpassport, updatepassport, listpassport, deletepassport , searchpassport};

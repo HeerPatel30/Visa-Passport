@@ -20,7 +20,7 @@ let storage = new CloudinaryStorage({
                 height: 500,
                 crop: 'limit'
             }],
-            public_id: `${file.filename}-${Date.now()}`
+            public_id: `${file.fieldname}-${Date.now()}`
         }
     }
 })

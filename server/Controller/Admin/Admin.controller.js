@@ -5,6 +5,7 @@ import Config from "../../Config/Config.js";
 import Token from "../../Models/Token/token.js";
 import mongoose from "mongoose";
 import PassportApplication from "../../Models/Applicants/Passport.js";
+import Visa from "../../Models/Applicants/Visa.js";
 
 let ObjectId = mongoose.Types.ObjectId
 const _Config = new Config()
@@ -186,6 +187,48 @@ const deletepassport = async (req, res, next) => {
     });
   }
 };
+const deletevisa = async (req, res, next) => {
+  try {
+   let formdata = req.body ;
+   let ResponseBody = {}
+  
+      if (!formdata._id) {
+        return res.status(400).json({
+          message: "Passport ID is required",
+          status: 400,
+          data: [],
+        });
+      }
+
+      const visa = await VisaApplication.findOne({ _id: new ObjectId(formdata._id) });
+
+      if (!visa) {
+        return res.status(404).json({
+          message: "Visa not found",
+          status: 404,
+          data: [],
+        });
+      }
+
+      await VisaApplication.deleteOne({ _id: new ObjectId(formdata._id) });
+
+      ResponseBody = {
+        message: "Visa deleted successfully",
+        status: 200,
+        data: [],
+      };
+      return res.status(200).json(ResponseBody);
+
+  }
+  catch (error) {
+    console.error("Error in deletepassport:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      status: 500,
+      error: error.message,
+    });
+  }
+};
 
 const listpassport = async (req, res, next) => {
   try {
@@ -335,16 +378,127 @@ const adminpassportupdate = async ( req, res,next) => {
     }
 }
 
+const adminvisaupdate = async(req, res, next)=>{
+  try {
+     let formdata = req.body 
+     let ResponseBody = { }
+
+     let data = await Visa.findByIdAndUpdate({_id :new ObjectId(formdata._id)},formdata,{new :true})
+     if (data) {
+      ResponseBody = {
+        status: 200,
+        message: "Visa Application updated Successfully.",
+        data: data,
+      }
+      return res.status(200).json(ResponseBody);
+    }
+    else{
+      ResponseBody = {
+        status: 400,
+        message: "Error while updating Visa Application",
+      };
+      return res.status(400).json(ResponseBody);
+    }
+  } catch (error) {
+      res.status(500).json({
+        message: "Internal Server Error",
+        error : error.message,
+        status: 500,
+      });
+  }
+}
+
+const listvisa = async (req,res)=>{
+  try {
+    let formdata = req.body 
+    let pipeline = []
+    if(formdata.search){
+      let searchableFields = [
+        "visano",
+        "fullName",
+        "email",
+        "phone",
+        "passportNumber",
+        "visaType",
+        "destinationCountry"
+      ];
+      let orQuery = searchableFields.map(field => ({
+        [field]: { $regex: formdata.search, $options: "i" }
+      }));
+      pipeline.push({ $match: { $or: orQuery } });
+    }
+    if( formdata.filter) {
+      let filterQuery = {};
+      if (formdata.filter.status) {
+        filterQuery.status = parseInt(formdata.filter.status);
+      }
+      if (formdata.filter.visaType) {
+        filterQuery.visaType = formdata.filter.visaType;
+      }
+      if (Object.keys(filterQuery).length > 0) {
+        pipeline.push({ $match: filterQuery });
+      }
+    }
+    if(formdata.filter.fromDate && formdata.filter.toDate) {
+      pipeline.push({
+        $addFields: {
+          date: { $substr: ["$submittedAt", 0, 10] } // Extract 'YYYY-MM-DD'
+        }
+      });
+      pipeline.push({
+        $match: {
+          date: {
+            $gte: formdata.filter.fromDate,
+            $lte: formdata.filter.toDate
+          }
+        }
+      });
+    }
+    if (formdata.page && formdata.limit) {
+      const page = parseInt(formdata.page);
+      const limit = parseInt(formdata.limit);
+      const skip = (page - 1) * limit;
+
+      pipeline.push({
+        $facet: {
+          data: [{ $skip: skip }, { $limit: limit }],
+          totalCount: [{ $count: "count" }]
+        }
+      });
+    }
+    
+    let data = await Visa.aggregate(pipeline);
+    if (data.length > 0) {
+      return res.status(200).json({
+        message: "Data fetched successfully",
+        status: 200,
+        data:data
+      });
+    } else {
+      return res.status(404).json({
+        message: "No data found",
+        status: 404,
+        data: [],
+      });
+    }
+  } catch (error) {
+      res.status(500).json({
+        message: "Internal Server Error", 
+        error: error.message,
+        status: 500,  
+      })
+  }
+}
 const chartandcount = async (req,res,next)=>{
   try {
-      let formdata = req.body
+     
       let ResponseBody = {}
       let pipeline = [
         {
            $group :{
             _id: "$status",
             count: { $sum: 1 } ,
-            data: { $addToSet: "$$ROOT" }
+            // data: { $addToSet: "$$ROOT" }
            }
         }
       ]
@@ -377,4 +531,46 @@ const chartandcount = async (req,res,next)=>{
     });
   }
 }
-export { AddAdmin, AdminLogin, updateadmin, listpassport, adminpassportupdate, chartandcount , deletepassport };
+const visachartandcount = async (req,res,next)=>{
+  try {
+     
+      let ResponseBody = {}
+      let pipeline = [
+        {
+           $group :{
+            _id: "$status",
+            count: { $sum: 1 } ,
+            // data: { $addToSet: "$$ROOT" }
+           }
+        }
+      ]
+      let totalcount = await Visa.countDocuments();
+      let data = await Visa.aggregate(pipeline)
+      if (data.length > 0) {
+        ResponseBody = {
+          message: "Data fetched successfully",
+          status: 200,
+          data: data ,
+          total: totalcount,
+        }
+        return res.status(200).json(ResponseBody);
+      } else {
+        ResponseBody = {
+          message: "No data found",
+          status: 404,
+          data: []
+        }
+        return res.status(404).json(ResponseBody);
+      }   
+
+
+  } catch (error) {
+    console.error("Error in chartandcount:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      status: 500,
+      error: error.message,
+    });
+  }
+}
+export { AddAdmin, AdminLogin, updateadmin, listpassport, adminpassportupdate, chartandcount , deletepassport , adminvisaupdate, listvisa,visachartandcount };

@@ -4,12 +4,13 @@ import ConnectDB from "./Database/connect.js";
 import AdminRouter from "./Routes/Admin/admin.router.js";
 import passportRouter from "./Routes/Passport/passport.router.js";
 import cors from "cors";
+import visarouter from "./Routes/Visa/visa.router.js";
 
 dotenv.config();
 
 const app = express();
 
-// Enable CORS early, before routes
+// Enable CORS 
 app.use(
   cors({
     origin:[ "http://localhost:5173" ,"https://visa-passport.vercel.app" ], 
@@ -19,14 +20,14 @@ app.use(
   })
 );
 
-// Body parsers must be before routes too
+// Body parsers 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Now mount your routes
+
 app.use("/", AdminRouter);
 app.use("/", passportRouter);
-
+app.use("/", visarouter);
 // Connect to DB and start server
 ConnectDB()
   .then(() => {

@@ -32,6 +32,7 @@ export default class Config {
   async deleteCloudinaryFile(url) {
     try {
       // Split the URL to get the part after `/upload/`
+      console.log(url)
       const urlParts = url.split("/upload/");
       if (urlParts.length < 2) {
         console.error("Invalid Cloudinary URL format:", url);
