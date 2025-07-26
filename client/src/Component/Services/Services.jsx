@@ -54,6 +54,7 @@ const Services = () => {
         </p>  
       </div>
 
+    {/* search option for the passport*/}
       {/* Service Cards */}
       <div className="flex flex-wrap justify-center gap-10 px-4 py-10">
         {servicedata.map((service, index) => (
@@ -82,15 +83,15 @@ const Services = () => {
       <div className="flex justify-center">
         <button
           type="button"
-          className="relative z-10 w-[200px] py-2 font-sans text-gray-50 rounded-xl bg-red-600 overflow-hidden
+          className="relative z-10 w-[250px] py-2 font-sans text-gray-50 rounded-xl bg-red-600 overflow-hidden
             before:content-[''] before:absolute before:inset-0 before:bg-transparent before:z-0
             hover:before:bg-blue-400 transition duration-300"
           onClick={() => navigate("/passportform")}
         >
-          <span className="relative z-10 text-2xl">Apply For Service</span>
+          <span className="relative z-10 text-2xl">Apply For Passport</span>
         </button>
       </div>
-
+      
       {/* Show Country only on /service route */}
       {isServicePage && <Country />}
     </div>

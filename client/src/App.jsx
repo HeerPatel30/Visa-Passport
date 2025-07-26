@@ -12,6 +12,8 @@ import ContactUs from "./Component/Contact/Contact"
 import PassportApplicationForm from "./Component/Passportform/Passport";
 import Dashboard from "./Component/Dashboard/Dashboard";
 import LoginPage from "./Component/Login/Login";
+import VisaApplicationForm from "./Component/Visaform/Visa";
+import PassportSearch from "./Component/Search/Search";
 
 function App() {
   return (
@@ -31,6 +33,7 @@ function App() {
                   <About />
                   <Card />
                   <Services />
+                  <PassportSearch/>
                   <Country />
                 </>
               }
@@ -56,6 +59,7 @@ function App() {
             <Route path="/countries" element={<Country />} />
             <Route path="/contactus" element={<ContactUs />} />
             <Route path="/passportform" element={<PassportApplicationForm />} />
+            <Route path="/visaform" element={<VisaApplicationForm />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<LoginPage />} />
           </Routes>

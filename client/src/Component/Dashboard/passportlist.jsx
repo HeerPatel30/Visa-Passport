@@ -1,6 +1,28 @@
 import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  Modal,
+  Pagination,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+  Divider,
+  Grid,
+  Link,
+} from "@mui/material";
+import { Close, Search } from "@mui/icons-material";
 
-export default function PassportList() {
+export default function PassportListMUI() {
   const [applications, setApplications] = useState([]);
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState("");
@@ -42,9 +64,7 @@ export default function PassportList() {
               },
         }),
       });
-
       const result = await res.json();
-
       if (result.status === 200) {
         const nested = result?.data?.[0];
         setApplications(Array.isArray(nested?.data) ? nested.data : []);
@@ -66,24 +86,6 @@ export default function PassportList() {
     fetchData();
   }, [page]);
 
-  const handleFilterSubmit = (e) => {
-    e.preventDefault();
-    setPage(1);
-    fetchData();
-    showNotification("Filters applied", "info");
-  };
-
-  const handleResetFilters = () => {
-    setSearch("");
-    setFromDate("");
-    setToDate("");
-    setStatus("");
-    setBookletType("");
-    setPage(1);
-    fetchData();
-    showNotification("Filters reset", "info");
-  };
-
   const handleStatusChange = async (_id, newStatus) => {
     try {
       const res = await fetch("https://visa-passport.onrender.com/admin/passportupdate", {
@@ -96,15 +98,12 @@ export default function PassportList() {
         },
         body: JSON.stringify({ _id, status: newStatus }),
       });
-
       const result = await res.json();
-
       if (result.status === 200) {
-        showNotification(result.message || "Status updated successfully", "success");
-        setPage(1);
+        showNotification("Status updated successfully", "success");
         fetchData();
       } else {
-        showNotification(result.message || "Failed to update status", "error");
+        showNotification("Failed to update status", "error");
       }
     } catch (err) {
       console.error(err);
@@ -114,7 +113,6 @@ export default function PassportList() {
 
   const handleDelete = async (_id) => {
     if (!window.confirm("Are you sure you want to delete this application?")) return;
-
     try {
       const res = await fetch("https://visa-passport.onrender.com/admin/passportdelete", {
         method: "DELETE",
@@ -126,15 +124,12 @@ export default function PassportList() {
         },
         body: JSON.stringify({ _id }),
       });
-
       const result = await res.json();
-
       if (result.status === 200) {
-        showNotification(result.message || "Application deleted successfully", "success");
-        setPage(1);
+        showNotification("Application deleted successfully", "success");
         fetchData();
       } else {
-        showNotification(result.message || "Failed to delete application", "error");
+        showNotification("Failed to delete application", "error");
       }
     } catch (err) {
       console.error("Delete failed", err);
@@ -144,265 +139,188 @@ export default function PassportList() {
 
   const totalPages = Math.ceil(totalCount / limit);
 
-  return (
-    <div className="p-4 relative">
-      {notification && (
-        <div
-          className={`fixed top-2 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded shadow text-white ${
-            notification.type === "success"
-              ? "bg-green-500"
-              : notification.type === "error"
-              ? "bg-red-500"
-              : "bg-blue-500"
-          }`}
-        >
-          {notification.msg}
-        </div>
-      )}
+  const renderDetails = (app) => {
+    const infoSections = {
+      "Personal Information": {
+        Name: `${app.firstname} ${app.middlename} ${app.lastname}`,
+        Gender: app.gender,
+        DOB: app.dob,
+        Nationality: app.nationality,
+        MaritalStatus: app.maritalstatus,
+      },
+      "Contact Information": {
+        Email: app.email,
+        Phone: app.phone,
+        AlternatePhone: app.alternatePhone,
+      },
+      "Address Information": {
+        PresentAddress: app.presentAddress,
+        PermanentAddress: app.permanentAddress,
+      },
+      "Family Details": {
+        Father: app.fatherName,
+        Mother: app.motherName,
+        Spouse: app.spouseName,
+      },
+      "Employment Details": {
+        Occupation: app.occupation,
+        Organization: app.organization,
+        Designation: app.designation,
+      },
+      "Passport Details": {
+        BookletType: app.bookletType,
+        Status: app.status,
+        SubmissionDate: new Date(app.submissionDate).toLocaleString(),
+      },
+    };
 
-      <h2 className="text-xl font-semibold mb-4 text-center">Passport Applications</h2>
+    return (
+      <Box>
+        {Object.entries(infoSections).map(([section, fields]) => (
+          <Box key={section} mb={3}>
+            <Typography variant="h6" gutterBottom>{section}</Typography>
+            <Grid container spacing={2}>
+              {Object.entries(fields).map(([label, val]) => (
+                <Grid item xs={12} sm={6} key={label}>
+                  <Typography variant="body2"><strong>{label}:</strong> {val || "N/A"}</Typography>
+                </Grid>
+              ))}
+            </Grid>
+            <Divider sx={{ mt: 2 }} />
+          </Box>
+        ))}
 
-      {/* Filters */}
-      <form
-        onSubmit={handleFilterSubmit}
-        className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4 text-sm items-end"
-      >
-        <input
-          type="text"
-          placeholder="Search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border rounded px-2 py-1"
-        />
-        <input
-          type="date"
-          value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
-          className="border rounded px-2 py-1"
-        />
-        <input
-          type="date"
-          value={toDate}
-          onChange={(e) => setToDate(e.target.value)}
-          className="border rounded px-2 py-1"
-        />
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="border rounded px-2 py-1"
-        >
-          <option value="">All Status</option>
-          <option value="Pending">Pending</option>
-          <option value="Approved">Approved</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-        <select
-          value={bookletType}
-          onChange={(e) => setBookletType(e.target.value)}
-          className="border rounded px-2 py-1"
-        >
-          <option value="">All Booklet Types</option>
-          <option value="30 pages">30 pages</option>
-          <option value="60 pages">60 pages</option>
-        </select>
+        <Typography variant="h6" gutterBottom>Uploaded Documents</Typography>
+        <Grid container spacing={2}>
+          {app.documents && Object.entries(app.documents).map(([docKey, value]) => {
+            const displayName = docKey
+              .replace(/([A-Z])/g, ' $1')
+              .replace(/^./, str => str.toUpperCase());
 
-        <div className="col-span-2 md:col-span-1 flex gap-2">
-          <button
-            type="submit"
-            className="bg-blue-500 text-white rounded px-4 py-1 hover:bg-blue-600 w-full"
-          >
-            Apply Filters
-          </button>
-          <button
-            type="button"
-            onClick={handleResetFilters}
-            className="bg-gray-400 text-white rounded px-4 py-1 hover:bg-gray-500 w-full"
-          >
-            Reset
-          </button>
-        </div>
-      </form>
-
-      {/* Table */}
-      <div className="overflow-x-auto rounded shadow">
-        <table className="min-w-full bg-white text-sm text-left">
-          <thead className="bg-gray-100 text-gray-700">
-            <tr>
-              <th className="py-2 px-3">Name</th>
-              <th className="py-2 px-3">Gender</th>
-              <th className="py-2 px-3">Booklet</th>
-              <th className="py-2 px-3 text-center">Documents</th>
-              <th className="py-2 px-3">Phone</th>
-              <th className="py-2 px-3">Status</th>
-              <th className="py-2 px-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {applications.map((item, index) => (
-              <tr key={index} className="border-b hover:bg-gray-50">
-                <td className="py-2 px-3">
-                  {item.firstname} {item.middlename} {item.lastname}
-                </td>
-                <td className="py-2 px-3">{item.gender || "N/A"}</td>
-                <td className="py-2 px-3">{item.bookletType || "N/A"}</td>
-                <td className="py-2 px-3 text-center">
-                  {item.documents?.aadhaarCard ? (
-                    <span className="text-green-600">✅</span>
-                  ) : (
-                    <span className="text-red-500">❌</span>
-                  )}
-                </td>
-                <td className="py-2 px-3">{item.phone || "N/A"}</td>
-                <td className="py-2 px-3 space-x-1">
-                  {["Pending", "Approved", "Rejected"].map((statusOption) => {
-                    const isActive = item.status === statusOption;
-                    const colorClasses = {
-                      Pending: "bg-yellow-100 text-yellow-700 border-yellow-400",
-                      Approved: "bg-green-100 text-green-700 border-green-400",
-                      Rejected: "bg-red-100 text-red-700 border-red-400",
-                    };
-
-                    return (
-                      <button
-                        key={statusOption}
-                        onClick={() =>
-                          !isActive && handleStatusChange(item._id, statusOption)
-                        }
-                        className={`px-2 py-1 border rounded text-xs font-semibold ${
-                          colorClasses[statusOption]
-                        } ${isActive ? "opacity-100" : "opacity-50 hover:opacity-80"}`}
-                      >
-                        {statusOption}
-                      </button>
-                    );
-                  })}
-                </td>
-                <td className="py-2 px-3 space-x-2">
-                  <button
-                    onClick={() => setSelectedApplication(item)}
-                    className="bg-green-500 text-white text-xs px-2 py-1 rounded"
+            if (Array.isArray(value)) {
+              return value.map((url, idx) => (
+                <Grid item xs={12} sm={6} md={4} key={`${docKey}-${idx}`}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    {displayName} {idx + 1}
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    fullWidth
+                    size="small"
+                    onClick={() => window.open(url, "_blank")}
                   >
                     View
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item._id)}
-                    className="bg-red-500 text-white text-xs px-2 py-1 rounded"
+                  </Button>
+                </Grid>
+              ));
+            }
+
+            return (
+              <Grid item xs={12} sm={6} md={4} key={docKey}>
+                <Typography variant="subtitle2" gutterBottom>{displayName}</Typography>
+                {value ? (
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    fullWidth
+                    size="small"
+                    onClick={() => window.open(value, "_blank")}
                   >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {applications.length === 0 && (
-              <tr>
-                <td colSpan="7" className="text-center py-4 text-gray-500">
-                  No Applications Found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-center mt-4 space-x-4">
-        <button
-          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-          disabled={page === 1}
-          className="px-4 py-1 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        <span className="px-4 py-1">Page {page} of {totalPages}</span>
-        <button
-          onClick={() => setPage((prev) => (prev < totalPages ? prev + 1 : prev))}
-          disabled={page >= totalPages}
-          className="px-4 py-1 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-
-      {/* View Modal */}
-      {selectedApplication && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 overflow-auto">
-          <div className="bg-white rounded-lg shadow p-6 w-[95%] max-w-3xl relative">
-            <button
-              onClick={() => setSelectedApplication(null)}
-              className="absolute top-2 right-2 text-gray-500"
-            >
-              ✖
-            </button>
-            <h3 className="text-lg font-semibold mb-4">Application Details</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              {Object.entries({
-                Name: `${selectedApplication.firstname} ${selectedApplication.middlename} ${selectedApplication.lastname}`,
-                Gender: selectedApplication.gender,
-                DOB: selectedApplication.dob,
-                Nationality: selectedApplication.nationality,
-                MaritalStatus: selectedApplication.maritalstatus,
-                Email: selectedApplication.email,
-                Phone: selectedApplication.phone,
-                AlternatePhone: selectedApplication.alternatePhone,
-                PresentAddress: selectedApplication.presentAddress,
-                PermanentAddress: selectedApplication.permanentAddress,
-                Father: selectedApplication.fatherName,
-                Mother: selectedApplication.motherName,
-                Spouse: selectedApplication.spouseName,
-                Occupation: selectedApplication.occupation,
-                Organization: selectedApplication.organization,
-                Designation: selectedApplication.designation,
-                BookletType: selectedApplication.bookletType,
-                Status: selectedApplication.status,
-                SubmissionDate: new Date(selectedApplication.submissionDate).toLocaleString(),
-              }).map(([label, value]) => (
-                <p key={label}>
-                  <strong>{label}:</strong> {value || "N/A"}
-                </p>
-              ))}
-            </div>
-
-            <div className="mt-4">
-              <h4 className="font-semibold mb-2">Documents</h4>
-              <ul className="list-disc list-inside text-sm space-y-1">
-                {Object.entries(selectedApplication.documents || {}).map(([key, value]) =>
-                  key === "others" ? (
-                    value.map((url, i) => (
-                      <li key={i}>
-                        Other Document {i + 1}:{" "}
-                        <a
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          View
-                        </a>
-                      </li>
-                    ))
-                  ) : (
-                    <li key={key}>
-                      {key.charAt(0).toUpperCase() + key.slice(1)}:{" "}
-                      {value ? (
-                        <a
-                          href={value}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          View
-                        </a>
-                      ) : (
-                        "Not Uploaded"
-                      )}
-                    </li>
-                  )
+                    View
+                  </Button>
+                ) : (
+                  <Typography variant="body2" color="text.secondary">Not Uploaded</Typography>
                 )}
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+              </Grid>
+            );
+          })}
+        </Grid>
+      </Box>
+    );
+  };
+
+  return (
+    <Box p={3}>
+      <Typography variant="h5" align="center" gutterBottom>Passport Applications</Typography>
+
+      <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
+        <TextField size="small" label="Search" value={search} onChange={(e) => setSearch(e.target.value)} InputProps={{ endAdornment: <InputAdornment position="end"><Search /></InputAdornment> }} />
+        <TextField size="small" type="date" label="From" value={fromDate} onChange={(e) => setFromDate(e.target.value)} InputLabelProps={{ shrink: true }} />
+        <TextField size="small" type="date" label="To" value={toDate} onChange={(e) => setToDate(e.target.value)} InputLabelProps={{ shrink: true }} />
+          <TextField size="small" select label="Status" value={status} onChange={(e) => setStatus(e.target.value)} sx={{ minWidth: 200 }}>
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="Pending">Pending</MenuItem>
+            <MenuItem value="Approved">Approved</MenuItem>
+            <MenuItem value="Rejected">Rejected</MenuItem>
+          </TextField>
+        <TextField size="small" select label="Booklet" value={bookletType} onChange={(e) => setBookletType(e.target.value)} sx={{ minWidth: 200 }}>
+          <MenuItem value="">All</MenuItem>
+          <MenuItem value="30 pages">30 pages</MenuItem>
+          <MenuItem value="60 pages">60 pages</MenuItem>
+        </TextField>
+        <Button variant="contained" onClick={fetchData}>Apply</Button>
+        <Button variant="outlined" onClick={() => { setSearch(""); setFromDate(""); setToDate(""); setStatus(""); setBookletType(""); setPage(1); fetchData(); }}>Reset</Button>
+      </Box>
+
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Gender</TableCell>
+              <TableCell>Booklet</TableCell>
+              <TableCell>Documents</TableCell>
+              <TableCell>Phone</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {applications.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{item.firstname} {item.middlename} {item.lastname}</TableCell>
+                <TableCell>{item.gender || "N/A"}</TableCell>
+                <TableCell>{item.bookletType || "N/A"}</TableCell>
+                <TableCell>{item.documents?.aadhaarCard ? "✅" : "❌"}</TableCell>
+                <TableCell>{item.phone || "N/A"}</TableCell>
+                <TableCell>
+                  {["Pending", "Approved", "Rejected"].map(statusOption => (
+                    <Button
+                      key={statusOption}
+                      size="small"
+                      variant={item.status === statusOption ? "contained" : "outlined"}
+                      color={statusOption === "Approved" ? "success" : statusOption === "Rejected" ? "error" : "warning"}
+                      onClick={() => item.status !== statusOption && handleStatusChange(item._id, statusOption)}
+                      sx={{ m: 0.3 }}
+                    >
+                      {statusOption}
+                    </Button>
+                  ))}
+                </TableCell>
+                <TableCell>
+                  <Button size="small" onClick={() => setSelectedApplication(item)} color="success">View</Button>
+                  <Button size="small" onClick={() => handleDelete(item._id)} color="error">Delete</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <Box display="flex" justifyContent="center" mt={2}>
+        <Pagination count={totalPages} page={page} onChange={(_, val) => setPage(val)} />
+      </Box>
+
+      <Modal open={!!selectedApplication} onClose={() => setSelectedApplication(null)}>
+        <Box sx={{ bgcolor: 'background.paper', m: 'auto', mt: 4, p: 4, borderRadius: 2, width: '90%', maxWidth: 800, position: 'relative', maxHeight: '90vh', overflow: 'auto' }}>
+          <IconButton onClick={() => setSelectedApplication(null)} sx={{ position: 'absolute', right: 8, top: 8 }}>
+            <Close />
+          </IconButton>
+          <Typography variant="h6" gutterBottom>Application Details</Typography>
+          {selectedApplication && renderDetails(selectedApplication)}
+        </Box>
+      </Modal>
+    </Box>
   );
 }

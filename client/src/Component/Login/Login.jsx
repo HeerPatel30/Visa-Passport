@@ -24,8 +24,8 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch("https://visa-passport.onrender.com/admin/login", {
+    try {                 //https://visa-passport.onrender.com/admin/login http://localhost:3031/admin/login
+      const response = await fetch("http://localhost:3031/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

@@ -6,12 +6,12 @@ const imagearray = [
   {
     url: "https://images.pexels.com/photos/7235804/pexels-photo-7235804.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     text: "Fast, Easy, Hassle-Free Visa & Passport Solutions!",
-    applyLink: "#apply-nature", // Replace with actual link
+    applyLink: "/visaform", // Replace with actual link
   },
   {
     url: "https://images.pexels.com/photos/7009468/pexels-photo-7009468.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     text: "Your Journey Begins Here – Trusted Visa & Passport Services.",
-    applyLink: "#apply-sea", // Replace with actual link
+    applyLink: "/passportform", // Replace with actual link
   },
 ];
 
