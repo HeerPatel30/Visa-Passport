@@ -5,12 +5,13 @@ import indialogo from "../../assets/india-flag.png";
 import auslogo from "../../assets/aus.png";
 import irelandlogo from "../../assets/Flag_of_Ireland.svg.png";
 import brazillogo from "../../assets/Flag_of_Brazil.svg.png";
-
+import { useLocation, useNavigate } from "react-router-dom";
 // Importing country backgrounds
 import india from "../../assets/india.webp";
 import aus from "../../assets/aus-1.avif";
 import ireland from "../../assets/ireland.jpg";
 import brazil from "../../assets/brazil.avif";
+import { Navigate } from "react-router-dom";
 
 const countries = [
   {
@@ -36,6 +37,8 @@ const countries = [
 ];
 
 const Country = () => {
+   const location = useLocation();
+   const navigate = useNavigate();
   return (
     <div className="my-[50px]">
            {/* Section Title */}
@@ -100,8 +103,9 @@ const Country = () => {
           className="relative z-10 w-[200px] py-2 font-sans text-gray-50 rounded-xl bg-red-600 overflow-hidden
              before:content-[''] before:absolute before:inset-0 before:bg-transparent before:z-0
              hover:before:bg-blue-400 transition duration-300"
+             onClick={() => navigate("/visaform")}
         >
-          <span className="relative z-10 text-2xl">Apply For Service</span>
+          <span className="relative z-10 text-2xl">Apply For Visa</span>
         </button>
       </div>
     </div>

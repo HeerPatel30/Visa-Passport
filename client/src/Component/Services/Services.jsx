@@ -1,10 +1,12 @@
 import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
 import dollar from "../../assets/dollar_9731012.png";
 import visa from "../../assets/visa_5968248.png";
 import time from "../../assets/time_8465102.png";
 import speech from "../../assets/speech_795232.png";
+
 import Country from "../Country/Country";
-import { useLocation } from "react-router-dom";
 
 // Array of services
 const servicedata = [
@@ -16,6 +18,7 @@ const servicedata = [
 
 const Services = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isServicePage = location.pathname === "/services";
 
   return (
@@ -48,9 +51,10 @@ const Services = () => {
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. <br />
           Atque quod blanditiis at quae molestiae vel magnam. Porro, dolores
           iste recusandae ex delectus eveniet perspiciatis optio.
-        </p>
+        </p>  
       </div>
 
+    {/* search option for the passport*/}
       {/* Service Cards */}
       <div className="flex flex-wrap justify-center gap-10 px-4 py-10">
         {servicedata.map((service, index) => (
@@ -78,15 +82,16 @@ const Services = () => {
       {/* Button */}
       <div className="flex justify-center">
         <button
-          type="submit"
-          className="relative z-10 w-[200px] py-2 font-sans text-gray-50 rounded-xl bg-red-600 overflow-hidden
-             before:content-[''] before:absolute before:inset-0 before:bg-transparent before:z-0
-             hover:before:bg-blue-400 transition duration-300"
+          type="button"
+          className="relative z-10 w-[250px] py-2 font-sans text-gray-50 rounded-xl bg-red-600 overflow-hidden
+            before:content-[''] before:absolute before:inset-0 before:bg-transparent before:z-0
+            hover:before:bg-blue-400 transition duration-300"
+          onClick={() => navigate("/passportform")}
         >
-          <span className="relative z-10 text-2xl">Apply For Service</span>
+          <span className="relative z-10 text-2xl">Apply For Passport</span>
         </button>
       </div>
-
+      
       {/* Show Country only on /service route */}
       {isServicePage && <Country />}
     </div>
@@ -94,4 +99,3 @@ const Services = () => {
 };
 
 export default Services;
-      {/* Heading */}

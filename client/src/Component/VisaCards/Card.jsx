@@ -7,7 +7,7 @@ import card3 from "../../assets/card3.avif";
 import card4 from "../../assets/card4.avif";
 import card5 from "../../assets/card5.avif";
 import card6 from "../../assets/card6.avif";
-
+import { useLocation, useNavigate } from "react-router-dom";
 const cardData = [
   { img: card1, title: "Job Visa" },
   { img: card2, title: "Travel Visa" },
@@ -18,6 +18,8 @@ const cardData = [
 ];
 
 const Card = () => {
+   const location = useLocation();
+  const navigate = useNavigate();
   return (
     <>
       <div className="flex items-center justify-center gap-2 my-6 leading-none">
@@ -72,7 +74,7 @@ const Card = () => {
                 explicabo reiciendis, ex aliquam nobis.
               </p>
 
-              <button className="mt-4 px-4 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+              <button className="mt-4 px-4 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition" onClick={() => navigate("/services")}>
                 Explore More
               </button>
             </div>
