@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Your smooth scroll code */
+html {
+  scroll-behavior: smooth;
+}
+section {
+  scroll-margin-top: 5rem;
+}

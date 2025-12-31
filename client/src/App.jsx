@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import "./App.css";
 
 import Sidenav from "./Component/Navbar/Sidenav";
@@ -8,50 +9,48 @@ import Services from "./Component/Services/Services";
 import Country from "./Component/Country/Country";
 import Footer from "./Component/Footer/Footer";
 import About from "./Component/Aboutus/About";
-import ContactUs from "./Component/Contact/Contact"
+import ContactUs from "./Component/Contact/Contact";
 import PassportApplicationForm from "./Component/Passportform/Passport";
 import Dashboard from "./Component/Dashboard/Dashboard";
 import LoginPage from "./Component/Login/Login";
 import VisaApplicationForm from "./Component/Visaform/Visa";
 import PassportSearch from "./Component/Search/Search";
 
+// Component to handle scrolling to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function App() {
   return (
     <Router>
-      <div className="min-h-screen overflow-x-hidden bg-gray-50 ">
+      <ScrollToTop />
+      <div className="min-h-screen overflow-x-hidden bg-gray-50 flex flex-col">
         {/* Top Navbar */}
         <Sidenav />
 
         {/* Main Content */}
-        <main className="pt-20 px-4 sm:px-6 md:px-8 space-y-6">
+        <main className="flex-grow pt-20 px-4 sm:px-6 md:px-8 space-y-6">
           <Routes>
+            {/* Landing Page Route with IDs for anchor scrolling */}
             <Route
               path="/"
               element={
-                <>
-                  <Banner />
-                  <About />
-                  <Card />
-                  <Services />
-                  <Country />
-                </>
+                <div className="space-y-12">
+                  <section id="hero"><Banner /></section>
+                  <section id="about"><About /></section>
+                  <section id="visa-cards"><Card /></section>
+                  <section id="services"><Services /></section>
+                  <section id="countries"><Country /></section>
+                </div>
               }
             />
 
-            <Route
-              path="/"
-              element={
-                <>
-                  <Banner />
-                  <About />
-                  <Card />
-                  <Services />
-                  <Country />
-                </>
-              }
-            />
-
-            {/* You can add more routes like this */}
+            {/* Individual Pages */}
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
             <Route path="/visa-cards" element={<Card />} />
