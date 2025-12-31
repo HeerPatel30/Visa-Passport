@@ -33,7 +33,6 @@ function App() {
                   <About />
                   <Card />
                   <Services />
-                  <PassportSearch/>
                   <Country />
                 </>
               }
@@ -62,6 +61,7 @@ function App() {
             <Route path="/visaform" element={<VisaApplicationForm />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/search" element={<PassportSearch />} />
           </Routes>
         </main>
 
