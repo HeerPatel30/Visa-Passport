@@ -6,35 +6,85 @@ let _Config = new Config()
 let ObjectId = mongoose.Types.ObjectId;
 const addvisa = async(req,res)=>{
     try {
-        let formdata = req.body; 
-        if(req.files && req.files.length > 0) {
-            const files = req.files;    
-            files.forEach(el => {
-                const field = el.fieldname;
-                if (field === "passportCopy") {
-                    if (!formdata[field]) formdata[field] = [];
-                    formdata[field].push({
-                        url: el.path,
-                        uploadedAt: new Date()
-                    }); 
-                } else {
-                    formdata[field] = {
-                        url: el.path,
-                        uploadedAt: new Date()
-                    };
-                }
+      let formdata = req.body;
+      if (req.files && req.files.length > 0) {
+        const files = req.files;
+        files.forEach((el) => {
+          const field = el.fieldname;
+          if (field === "passportCopy") {
+            if (!formdata[field]) formdata[field] = [];
+            formdata[field].push({
+              url: el.path,
+              uploadedAt: new Date(),
             });
-        }
-        formdata.visano = _Config.generate_random_applicationno(formdata.fullName);
-        let data = new Visa(formdata)
-        let result = await data.save();
-
-
-        res.json({
-          message: "Applied for Visa Successfully.",
-          status: 200,
-          data: result,
+          } else {
+            formdata[field] = {
+              url: el.path,
+              uploadedAt: new Date(),
+            };
+          }
         });
+      }
+      formdata.visano = _Config.generate_random_applicationno(
+        formdata.fullName
+      );
+      let data = new Visa(formdata);
+      let result = await data.save();
+
+      // ------------------------------------
+      // 📧 SEND EMAIL AFTER VISA APPLY
+      // ------------------------------------
+      const emailText = `
+      Dear ${formdata.fullName},
+
+      Your visa application has been submitted successfully.
+
+      Visa Application No: ${formdata.visano}
+      Contact No: ${formdata.phone || "Not Provided"}
+      Passport No: ${formdata.passportNo || "Not Provided"}
+
+      We will notify you about updates.
+    `;
+
+      const emailHtml = `
+      <h2>Visa Application Submitted</h2>
+      <p>Dear <b>${formdata.fullName}</b>,</p>
+
+      <p>Your visa application has been successfully submitted.</p>
+
+      <table border="1" cellpadding="6">
+        <tr>
+          <td><b>Visa Application No</b></td>
+          <td>${formdata.visano}</td>
+        </tr>
+        <tr>
+          <td><b>Contact No</b></td>
+          <td>${formdata.phone || "Not Provided"}</td>
+        </tr>
+        <tr>
+          <td><b>Passport No</b></td>
+          <td>${formdata.passportNo || "Not Provided"}</td>
+        </tr>
+      </table>
+
+      <br/>
+      <p>We will notify you about further updates.</p>
+      <b>Regards,<br/>Visa Department</b>
+    `;
+
+      await sendemail(
+        formdata.email, // user email
+        "Visa Application Submitted", // subject
+        emailText,
+        emailHtml
+      );
+      // ------------------------------------
+
+      res.json({
+        message: "Applied for Visa Successfully.",
+        status: 200,
+        data: result,
+      });
     } catch (error) {
         res.status(500).json({
           message: "Internal Server Error",

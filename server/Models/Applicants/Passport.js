@@ -4,6 +4,7 @@ const passportSchema = new mongoose.Schema(
   {
     //  code for passport application
     code: { type: String },
+    passportno :{ type: String },
     // 1. Personal QAA
     firstname: { type: String, required: true },
     middlename: { type: String },

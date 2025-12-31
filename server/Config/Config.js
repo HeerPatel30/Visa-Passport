@@ -1,8 +1,17 @@
 
 import { v2 as cloudinary} from 'cloudinary';
+import brevo from "@getbrevo/brevo"
 import dotenv from 'dotenv';
 dotenv.config();
 export default class Config {
+  constructor() {
+    this.apiInstance = new brevo.TransactionalEmailsApi();
+    this.apiInstance.setApiKey(
+      brevo.TransactionalEmailsApiApiKeys.apiKey,
+      process.env.BREVO_API_KEY
+    );
+  }
+
   Generatekey(length) {
     const chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -22,6 +31,30 @@ export default class Config {
     return cloudinary;
   }
 
+ generatePassportNumber() {
+  const letters = "ABCDEFGHJKLMNOPRSTUVWXYZ";
+  const letter = letters[Math.floor(Math.random() * letters.length)];
+  const digits = Math.floor(1000000 + Math.random() * 9000000);
+  return `${letter}${digits}`;
+}
+
+  async sendemail(to, subject, text) {
+    try {
+      let sendSmtpEmail = new brevo.SendSmtpEmail();
+      sendSmtpEmail = {
+        to: [{ email: to }],
+        sender: { email: "heerpatel879@gmail.com" },
+        subject: subject,
+        textContent: text,
+      };
+      const data = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+
+      return { success: true, messageId: data.messageId };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+
   generate_random_applicationno(firstname) {
     const timestamp = Date.now();
     const randomNumber = Math.floor(Math.random() * 10000); // Random number between 0 and 9999
@@ -32,7 +65,7 @@ export default class Config {
   async deleteCloudinaryFile(url) {
     try {
       // Split the URL to get the part after `/upload/`
-      console.log(url)
+      console.log(url);
       const urlParts = url.split("/upload/");
       if (urlParts.length < 2) {
         console.error("Invalid Cloudinary URL format:", url);

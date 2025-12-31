@@ -6,44 +6,96 @@ let _Config = new Config()
 let ObjectId = mongoose.Types.ObjectId
 const addpassport = async (req, res, next) => {
     try {
-        const files = req.files;
-        const formdata = req.body;
+      const files = req.files;
+      const formdata = req.body;
 
-        if (!files || files.length === 0) {
-            return res.status(400).json({
-                message: "No files uploaded",
-                status: 400,
-                data: [],
-            });
-        }
-
-        const documents = {};
-        for (const file of files) {
-            const field = file.fieldname;
-
-            if (field === "others") {
-                if (!documents[field]) documents[field] = [];
-                documents[field].push(file.path);
-            } else {
-                documents[field] = file.path;
-            }
-        }
-
-        //  application code generate 
-        let code = _Config.generate_random_applicationno(formdata.firstname);
-        formdata.code = code;
-        const newPassport = new PassportApplication({
-            ...formdata,
-            documents,
+      if (!files || files.length === 0) {
+        return res.status(400).json({
+          message: "No files uploaded",
+          status: 400,
+          data: [],
         });
+      }
 
-        await newPassport.save();
+      const documents = {};
+      for (const file of files) {
+        const field = file.fieldname;
 
-        res.status(200).json({
-            message: "Passport application submitted successfully",
-            status: 200,
-            data: newPassport,
-        });
+        if (field === "others") {
+          if (!documents[field]) documents[field] = [];
+          documents[field].push(file.path);
+        } else {
+          documents[field] = file.path;
+        }
+      }
+      //   passport number generate
+      formdata.passportno = _Config.generatePassportNumber();
+      //  application code generate
+      let code = _Config.generate_random_applicationno(formdata.firstname);
+      formdata.code = code;
+      const newPassport = new PassportApplication({
+        ...formdata,
+        documents,
+      });
+
+      await newPassport.save();
+
+      // send mail
+      // ------------------------------------
+      // 📧 SEND EMAIL HERE
+      // ------------------------------------
+
+      const emailText = `
+      Dear ${formdata.firstname},
+
+      Your passport application has been submitted successfully.
+        Application No: ${code}
+      Contact No: ${formdata.contactno}
+      Passport No: ${formdata.passportno || "Not Provided"}
+
+      We will update you shortly.
+
+      Regards,
+      Passport Office
+    `;
+
+      const emailHtml = `
+      <h2>Passport Application Submitted</h2>
+      <p>Dear <b>${formdata.firstname}</b>,</p>
+      <p>Your passport application has been submitted successfully.</p>
+
+      <table border="1" cellpadding="6">
+        <tr>
+          <td><b>Application No</b></td>
+          <td>${code}</td>
+        </tr>
+        <tr>
+          <td><b>Contact No</b></td>
+          <td>${formdata.contactno}</td>
+        </tr>
+        <tr>
+          <td><b>Passport No</b></td>
+          <td>${formdata.passportno || "Not Provided"}</td>
+        </tr>
+      </table>
+
+      <br/>
+      <p>We will update you shortly.</p>
+      <b>Regards,<br/>Passport Office</b>
+    `;
+
+    let mail = await _Config.sendemail(
+        formdata.email, // user email
+        "Passport Application Submitted",
+        emailText,
+        emailHtml
+      );
+      console.log("Email send status:", mail);
+      res.status(200).json({
+        message: "Passport application submitted successfully",
+        status: 200,
+        data: newPassport,
+      });
     } catch (error) {
         console.error(error);
         res.status(500).json({
@@ -103,6 +155,60 @@ const updatepassport = async (req, res) => {
             { new: true }
         );
 
+         // ------------------------------------
+    // 📧 SEND EMAIL AFTER UPDATE
+    // ------------------------------------
+    const emailText = `
+      Dear ${updatedPassport.firstname},
+
+      Your passport application has been updated successfully.
+
+        Application No: ${updatedPassport.code}
+      Contact No: ${updatedPassport.contactno}
+      Passport No: ${updatedPassport.passportno || "Not Provided"}
+
+      If you didn't request this update, please contact support.
+    `;
+
+    const emailHtml = `
+      <h2>Passport Application Updated</h2>
+      <p>Dear <b>${updatedPassport.firstname}</b>,</p>
+      <p>Your passport application has been <b>updated successfully</b>.</p>
+
+      <table border="1" cellpadding="6">
+        <tr>
+          <td><b>Application No</b></td>
+          <td>${updatedPassport.code}</td>
+        </tr>
+        <tr>
+          <td><b>Contact No</b></td>
+          <td>${updatedPassport.contactno}</td>
+        </tr>
+        <tr>
+          <td><b>Passport No</b></td>
+          <td>${updatedPassport.passportno || "Not Provided"}</td>
+        </tr>
+        <tr>
+          <td><b>Status</b></td>
+          <td>${updatedPassport.status || "Not Provided"}</td>
+        </tr>
+      </table>
+
+      <br/>
+      <p>If you didn't request this update, please contact support immediately.</p>
+      <b>Regards,<br/>Passport Office</b>
+    `;
+
+    await _Config.sendemail(
+      updatedPassport.email,
+      "Passport Application Updated",
+      emailText,
+      emailHtml
+    );
+    // ------------------------------------
+
+
+
         return res.status(200).json({
             message: "Passport application updated successfully",
             status: 200,
@@ -157,6 +263,7 @@ const searchpassport = async (req, res, next) => {
     if (formdata.search) {
       const searchableFields = [
         "code",
+        "passportno",
         "firstname",
         "middlename",
         "lastname",
@@ -171,6 +278,7 @@ const searchpassport = async (req, res, next) => {
         "motherName",
         "spouseName",
         "status",
+        "visano",
       ];
 
       const orQuery = searchableFields.map((field) => ({
@@ -179,7 +287,7 @@ const searchpassport = async (req, res, next) => {
 
       pipeline.push({ $match: { $or: orQuery } });
     }
-    let data = await PassportApplication.aggregate(pipeline);
+    let data =  await PassportApplication.aggregate(pipeline);
     if (data.length === 0) {
       ResponseBody = {
         message: "No passport applications found",
