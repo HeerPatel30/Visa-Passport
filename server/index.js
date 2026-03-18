@@ -28,6 +28,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", AdminRouter);
 app.use("/", passportRouter);
 app.use("/", visarouter);
+app.get("/health", (req, res) => {
+    res.status(200).json({
+      "status": 200,
+      "msg": "hello"
+    });
+});
+
 // Connect to DB and start server
 ConnectDB()
   .then(() => {
